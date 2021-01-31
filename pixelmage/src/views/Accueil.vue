@@ -16,7 +16,7 @@
     </div>
     <div class="row pt-5 pl-3">
       <div class="col-md-9 bg-primary">
-          <Game/>
+          <Game :timer="myTimer"/>
       </div>
       <div class="col-md-3">
         <perfect-scrollbar id="ps-container">
@@ -54,14 +54,11 @@ export default {
       messages: [],
       p: [],
       socket: io("localhost:3001"),
+      myTimer: 0,
     };
   },
 
-  watch: {
-    user(newuserName) {
-      localStorage.username = newuserName;
-    },
-  },
+  
 
   created() {
     window.addEventListener("beforeunload", () => this.beforeunloadFn());
@@ -142,6 +139,10 @@ export default {
       for (let i = 0; i < data.length; i++) {
         this.p = [...this.p, data[i]];
       }
+    });
+
+    this.socket.on('pixeliserImage',()=>{
+      this.myTimer++;
     });
   },
 };

@@ -12,11 +12,18 @@ import router from './router'
 import Vuex from 'vuex'
 Vue.use(Vuex)
 
+
 Vue.config.productionTip = false
 
 const store = new Vuex.Store({
   state: {
-    connected: false
+    connected: false,
+    images : [
+      { image: "roi_lion.jpg", reponse: "Le Roi Lion" },
+      { image: "hercule.jpg", reponse: "Hercule" },
+      { image: "mister_jack.jpg", reponse: "L'étrange Noël de Monsieur Jack" },
+      { image: "reine_des_neiges.jpg", reponse: "La Reine des Neiges" },
+    ],
   },
   mutations: {
     connection (state) {
@@ -24,6 +31,9 @@ const store = new Vuex.Store({
     }
   }
 })
+
+
+
 
 new Vue({
   store,

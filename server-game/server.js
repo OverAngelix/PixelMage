@@ -35,5 +35,15 @@ io.on('connection', function (socket) {
             listePersonne.splice(indexPersonne, 1);
         }
     });
+
+    io.emit('lancementChrono');
 });
 
+function chrono() {
+    setInterval(function () {
+        //console.log("coucou");
+        io.emit('pixeliserImage');
+    }, 1000);
+}
+
+chrono();
