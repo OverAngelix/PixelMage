@@ -1,3 +1,1 @@
-# PixelMage
-# Darkdragonnier : Developer
-# Test
+# Archetype-Game
