@@ -22,8 +22,8 @@
         <perfect-scrollbar id="ps-container">
           <div class="messages" v-for="(msg, index) in messages" :key="index">
             <p>
-              <span class="font-italic">{{ msg.timeInfo }}: </span>
-              <span class="font-weight-bold">{{ msg.user }}: </span>
+              <span class="font-italic" v-if="msg.timeInfo">({{ msg.timeInfo }}) </span>
+              <span class="font-weight-bold" v-if="msg.user">{{ msg.user }}: </span>
               {{ msg.message }}
             </p>
           </div>

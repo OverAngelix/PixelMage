@@ -4,6 +4,8 @@ let listePersonne = [];
 const app = express();
 let imageprogress = 1;
 let imageselected = 0;
+let reponseImage = "";
+let gameStart = true;
 
 
 
@@ -19,10 +21,14 @@ const io = require('socket.io')(server, {
 });
 
 io.on('connection', function (socket) {
-    console.log(socket.id)
+    // console.log(socket.id)
     socket.on('SEND_MESSAGE', function (data) {
         globalchat = [...globalchat, data];
         io.emit('MESSAGE', data);
+        if (data.message.toLowerCase() == reponseImage.toLowerCase()) {
+            message = data.user + " a trouvé la reponse"
+            io.emit('MESSAGE', { message: message });
+        }
     });
 
     socket.on('connexionServeur', function (data) {
@@ -38,12 +44,17 @@ io.on('connection', function (socket) {
         }
     });
     socket.on('lancementChrono', function (data) {
-        if (imageprogress <= 1) {
+        if (gameStart) {
             imageselected = Math.floor(Math.random() * data.imagessize)
             chrono();
         }
     });
-    // 
+    socket.on('reponseImage', function (data) {
+        if (gameStart) {
+            reponseImage = data.reponseImage
+            gameStart = false;
+        }
+    });
 });
 
 function chrono() {

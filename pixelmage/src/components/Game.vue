@@ -30,6 +30,9 @@ export default {
     this.$store.state.socket.on("pixeliserImage", (data) => {
       this.myTimer = data.imageprogress;
       this.myImageIndex = data.imageselected;
+      this.$store.state.socket.emit("reponseImage", {
+        reponseImage: this.$store.state.images[this.myImageIndex].reponse,
+      });
     });
   },
   methods: {
@@ -40,10 +43,9 @@ export default {
       };
       img.src = require("../assets/images/" +
         this.$store.state.images[this.myImageIndex].image);
-        console.log(img.src)
     },
   },
-    watch: {
+  watch: {
     myTimer(newTimer) {
       this.pixelateImage(newTimer / 10 + 1);
     },
