@@ -16,7 +16,7 @@
     </div>
     <div class="row pt-5 pl-3">
       <div class="col-md-9 bg-primary">
-          <Game :timer="myTimer"/>
+        <Game />
       </div>
       <div class="col-md-3">
         <perfect-scrollbar id="ps-container">
@@ -40,8 +40,7 @@
 </template>
 
 <script>
-import io from "socket.io-client";
-import Game from '../components/Game.vue'
+import Game from "../components/Game.vue";
 
 export default {
   components: {
@@ -53,12 +52,8 @@ export default {
       message: "",
       messages: [],
       p: [],
-      socket: io("localhost:3001"),
-      myTimer: 0,
     };
   },
-
-  
 
   created() {
     window.addEventListener("beforeunload", () => this.beforeunloadFn());
@@ -74,8 +69,7 @@ export default {
 
   methods: {
     beforeunloadFn() {
-      console.log(this.user);
-      this.socket.emit("deconnexionServeur", {
+      this.$store.state.socket.emit("deconnexionServeur", {
         user: this.user,
       });
     },
@@ -104,7 +98,7 @@ export default {
       if (this.message != "" && this.user != "") {
         e.preventDefault();
 
-        this.socket.emit("SEND_MESSAGE", {
+        this.$store.state.socket.emit("SEND_MESSAGE", {
           user: this.user,
           message: this.message,
           timeInfo: this.currentTime(),
@@ -115,7 +109,7 @@ export default {
   },
 
   mounted() {
-    this.socket.on("MESSAGE", (data) => {
+    this.$store.state.socket.on("MESSAGE", (data) => {
       this.messages = [...this.messages, data];
       this.scrollToEnd();
     });
@@ -123,26 +117,22 @@ export default {
     if (localStorage.username) {
       this.user = localStorage.username;
     }
-    this.socket.emit("connexionServeur", {
+    this.$store.state.socket.emit("connexionServeur", {
       user: this.user,
     });
 
-    this.socket.on("miseAJourChat", (data) => {
+    this.$store.state.socket.on("miseAJourChat", (data) => {
       this.messages = [];
       for (let i = 0; i < data.length; i++) {
         this.messages = [...this.messages, data[i]];
       }
     });
 
-    this.socket.on("miseAJourPersonnes", (data) => {
+    this.$store.state.socket.on("miseAJourPersonnes", (data) => {
       this.p = [];
       for (let i = 0; i < data.length; i++) {
         this.p = [...this.p, data[i]];
       }
-    });
-
-    this.socket.on('pixeliserImage',()=>{
-      this.myTimer++;
     });
   },
 };

@@ -12,13 +12,15 @@ import router from './router'
 import Vuex from 'vuex'
 Vue.use(Vuex)
 
+import  io from "socket.io-client";
 
 Vue.config.productionTip = false
 
 const store = new Vuex.Store({
   state: {
+    socket : io("localhost:3001"),
     connected: false,
-    images : [
+    images: [
       { image: "roi_lion.jpg", reponse: "Le Roi Lion" },
       { image: "hercule.jpg", reponse: "Hercule" },
       { image: "mister_jack.jpg", reponse: "L'étrange Noël de Monsieur Jack" },
@@ -26,8 +28,8 @@ const store = new Vuex.Store({
     ],
   },
   mutations: {
-    connection (state) {
-      state.connected=true;
+    connection(state) {
+      state.connected = true;
     }
   }
 })

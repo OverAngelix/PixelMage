@@ -19,6 +19,7 @@
     "vue-beautiful-chat": "^2.5.0",
     "vue-quick-chat": "^1.2.7",
     "vue-router": "^3.2.0",
+    "vue-socket.io": "^3.0.10",
     "vue2-perfect-scrollbar": "^1.5.0",
     "vuescroll": "^4.17.3",
     "vuetify": "^2.4.3",

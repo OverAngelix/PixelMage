@@ -2,6 +2,8 @@ const express = require('express');
 let globalchat = [];
 let listePersonne = [];
 const app = express();
+let imageprogress = 1;
+let imageselected = 0;
 
 
 
@@ -35,15 +37,23 @@ io.on('connection', function (socket) {
             listePersonne.splice(indexPersonne, 1);
         }
     });
-
-    io.emit('lancementChrono');
+    socket.on('lancementChrono', function (data) {
+        if (imageprogress <= 1) {
+            imageselected = Math.floor(Math.random() * data.imagessize)
+            chrono();
+        }
+    });
+    // 
 });
 
 function chrono() {
     setInterval(function () {
-        //console.log("coucou");
-        io.emit('pixeliserImage');
+        imageprogress++;
+        io.emit('pixeliserImage', {
+            imageprogress: imageprogress,
+            imageselected: imageselected
+        }
+        );
     }, 1000);
 }
 
-chrono();
