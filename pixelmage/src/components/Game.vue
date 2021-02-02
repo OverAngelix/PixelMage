@@ -95,6 +95,13 @@ export default {
         );
       }
     });
+    this.$store.state.socket.on('toutLeMondeATrouve', ()=>{
+      /* this.$store.state.socket.emit("newRound", {
+          imagessize: this.$store.state.images.length,
+          images:this.$store.state.images,
+        }); si on fait ça on n'affiche pas l'image nette à la fin*/
+      this.myTimer=this.timeRound;
+    });
   },
 
   watch: {

@@ -33,10 +33,19 @@ io.on('connection', function (socket) {
             let index = listePersonne.findIndex(e => e.user == data.user);
             if (!data.dejaRepondu) {
                 listePersonne[index].score++;
+                listePersonne[index].dejaRepondu=true;
                 io.emit('miseAJourRepondus', data);
             }
 
             io.emit('miseAJourScore', listePersonne);
+            //si tout le monde a rep, on passe au suivant
+            console.log(listePersonne.length);
+            console.log(listePersonne.filter(e=>e.dejaRepondu==true).length);
+             if(listePersonne.length==listePersonne.filter(e=>e.dejaRepondu==true).length){
+                console.log("tout le monde a trouvé");
+                io.emit('toutLeMondeATrouve');
+                imageprogress=timeRound;
+            } 
         }
         else {
             io.emit('MESSAGE', data);
@@ -90,6 +99,10 @@ io.on('connection', function (socket) {
             //imageselected = Math.floor(Math.random() * data.images.length)
             reponseImage = "";
             io.emit('RAZ');
+            for (let i=0;i<listePersonne.length;i++){
+                listePersonne[i].dejaRepondu=false;
+            }
+            console.log(listePersonne);
         }
     });
 });

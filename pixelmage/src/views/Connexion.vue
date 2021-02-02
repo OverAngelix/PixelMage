@@ -33,6 +33,7 @@ export default {
         this.$store.state.socket.emit("connexionServeur", {
           user: this.user,
           score : 0,
+          dejaRepondu: false,
         });
       }
     },
