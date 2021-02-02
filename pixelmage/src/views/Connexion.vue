@@ -9,11 +9,18 @@
         <button type="submit" class="btn btn-success">Envoyer</button>
       </form>
     </div>
+    <DarkTheme/>
   </div>
+
 </template>
 
+
 <script>
+import DarkTheme from "../components/DarkTheme.vue";
 export default {
+  components: {
+    DarkTheme,
+  },
   data() {
     return {
       user: "",

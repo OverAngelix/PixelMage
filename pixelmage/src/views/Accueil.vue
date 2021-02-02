@@ -36,15 +36,18 @@
         </form>
       </div>
     </div>
+    <DarkTheme/>
   </div>
 </template>
 
 <script>
 import Game from "../components/Game.vue";
+import DarkTheme from "../components/DarkTheme.vue";
 
 export default {
   components: {
     Game,
+    DarkTheme,
   },
   data() {
     return {
