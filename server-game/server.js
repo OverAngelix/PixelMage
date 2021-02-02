@@ -7,8 +7,8 @@ let imageselected = 0;
 let reponseImage = "";
 let gameStart = true;
 let nbround = 0;
-let maxround = 10;
-
+const maxround = 10;
+const timeRound = 60;
 
 
 const server = app.listen(3001, function () {
@@ -26,7 +26,7 @@ io.on('connection', function (socket) {
     // console.log(socket.id)
     socket.on('SEND_MESSAGE', function (data) {
         globalchat = [...globalchat, data];
-        if (data.message.toLowerCase() == reponseImage.toLowerCase()) {
+        if (data.message.toLowerCase() == reponseImage.toLowerCase() && imageprogress<timeRound) {
             message = data.user + " a trouvé la reponse"
             io.emit('MESSAGE', { message: message });
             let index = listePersonne.findIndex(e => e.user == data.user);
@@ -69,14 +69,12 @@ io.on('connection', function (socket) {
         if (gameStart) {
             imageselected = Math.floor(Math.random() * data.imagessize)
             chrono();
+            gameStart = false;
         }
     });
 
     socket.on('reponseImage', function (data) {
-        if (gameStart) {
-            reponseImage = data.reponseImage
-            gameStart = false;
-        }
+        reponseImage = data.reponseImage
     });
 
     socket.on('newRound', function (data) {
@@ -85,6 +83,7 @@ io.on('connection', function (socket) {
             imageprogress = 0;
             imageselected = Math.floor(Math.random() * data.imagessize)
             reponseImage = "";
+            io.emit('RAZ');
         }
     });
 });

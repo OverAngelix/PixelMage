@@ -22,7 +22,7 @@ const store = new Vuex.Store({
     socket : io("localhost:3001"),
     connected: false,
     images: [
-      { image: "roi_lion.jpg", reponse: "Le Roi Lion" },
+/*       { image: "roi_lion.jpg", reponse: "Le Roi Lion" },
       { image: "hercule.jpg", reponse: "Hercule" },
       { image: "mister_jack.jpg", reponse: "L'étrange Noël de Monsieur Jack" },
       { image: "reine_des_neiges.jpg", reponse: "La Reine des Neiges" },
@@ -31,6 +31,8 @@ const store = new Vuex.Store({
       { image: "raiponce.jpg", reponse: "Raiponce" },
       { image: "peter_pan.jpg", reponse: "Peter Pan" },
       { image: "bambi.jpg", reponse: "Bambi" },
+      { image: "101_dalmatiens.jpg", reponse: "101 dalmatiens" }, */
+      { image: "Capture.jpg", reponse: "OverAngelix & co" },
     ],
   },
   mutations: {

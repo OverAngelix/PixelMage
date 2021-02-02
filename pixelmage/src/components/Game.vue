@@ -3,11 +3,12 @@
     <div
       class="offset-md-2 col-md-8 offset-md-2 bg-warning mt-3 mb-3 text-center"
     >
-      BLABLA {{ myTimer }}
+      {{ response }} {{ myTimer }}
     </div>
-
     <div class="offset-md-2 col-md-8 offset-md-2 pl-0 pr-0">
-      <canvas id="canvas" class="img-fluid" />
+      <div class="row justify-content-md-center">
+        <canvas id="canvas" class="img-fluid" />
+      </div>
     </div>
   </div>
 </template>
@@ -21,6 +22,9 @@ export default {
     return {
       myImageIndex: -1,
       myTimer: 0,
+      timeRound: 60,
+      timeFinalRound: 70,
+      response: "",
     };
   },
   created() {
@@ -31,20 +35,42 @@ export default {
   methods: {
     pixelateImage(intensite) {
       var img = new Image();
-      if (this.myTimer < 60) {
+      if (this.myTimer < this.timeRound) {
         img.onload = function () {
           eightBit(document.getElementById("canvas"), img, intensite); //on va de 0 à 50
         };
         img.src = require("../assets/images/" +
           this.$store.state.images[this.myImageIndex].image);
       }
-      if (this.myTimer >= 60 && this.myTimer < 70) {
-        intensite = 50;
-      } else if (this.myTimer >= 60) {
+      if (
+        this.myTimer >= this.timeRound &&
+        this.myTimer < this.timeFinalRound
+      ) {
+        img.onload = function () {
+          eightBit(document.getElementById("canvas"), img, 50); //on va de 0 à 50
+        };
+        img.src = require("../assets/images/" +
+          this.$store.state.images[this.myImageIndex].image);
+      } else if (this.myTimer >= this.timeRound) {
         this.$store.state.socket.emit("newRound", {
           imagessize: this.$store.state.images.length,
         });
       }
+    },
+    replaceAllCharacter(chaine) {
+      let hiddenResponse = "";
+      for (var i = 0; i < chaine.length; i++) {
+        if (chaine.charAt(i) == "'") {
+          hiddenResponse += "' ";
+        } else if (chaine.charAt(i) == "-") {
+          hiddenResponse += "- ";
+        } else if (chaine.charAt(i) != " ") {
+          hiddenResponse += "__ ";
+        } else {
+          hiddenResponse += "\xa0\xa0\xa0\xa0";
+        }
+      }
+      return hiddenResponse;
     },
   },
 
@@ -52,9 +78,20 @@ export default {
     this.$store.state.socket.on("pixeliserImage", (data) => {
       this.myTimer = data.imageprogress;
       this.myImageIndex = data.imageselected;
+      console.log(this.$store.state.images[this.myImageIndex].reponse);
       this.$store.state.socket.emit("reponseImage", {
         reponseImage: this.$store.state.images[this.myImageIndex].reponse,
       });
+      if (
+        this.myTimer >= this.timeRound &&
+        this.myTimer <= this.timeFinalRound
+      ) {
+        this.response = this.$store.state.images[this.myImageIndex].reponse;
+      } else {
+        this.response = this.replaceAllCharacter(
+          this.$store.state.images[this.myImageIndex].reponse
+        );
+      }
     });
   },
 

@@ -7,10 +7,10 @@
         :key="index"
       >
         <li class="list-group-item active" v-if="personne.user == user">
-          {{ personne.user + personne.score }}
+          {{ personne.user }} <br> {{personne.score}}
         </li>
         <li class="list-group-item" v-else>
-          {{ personne.user + personne.score }}
+            {{ personne.user }} <br> {{personne.score}}
         </li>
       </ul>
     </div>
@@ -133,6 +133,10 @@ export default {
       for (let i = 0; i < data.length; i++) {
         this.messages = [...this.messages, data[i]];
       }
+    });
+
+  this.$store.state.socket.on("RAZ", () => {
+    this.dejaRepondu=false;
     });
 
     this.$store.state.socket.on("miseAJourPersonnes", (data) => {
