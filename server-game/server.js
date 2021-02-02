@@ -28,6 +28,13 @@ io.on('connection', function (socket) {
         if (data.message.toLowerCase() == reponseImage.toLowerCase()) {
             message = data.user + " a trouvé la reponse"
             io.emit('MESSAGE', { message: message });
+            let index = listePersonne.findIndex(e => e.user == data.user);
+            if (!data.dejaRepondu){
+                listePersonne[index].score++;
+                io.emit('miseAJourRepondus', data);
+            }
+            
+            io.emit('miseAJourScore', listePersonne);
         }
     });
 

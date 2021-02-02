@@ -3,14 +3,14 @@
     <div class="row justify-content-center">
       <ul
         class="listePersonnes col-1"
-        v-for="(personne, index) in p"
+        v-for="(personne, index) in listePersonne"
         :key="index"
       >
         <li class="list-group-item active" v-if="personne.user == user">
-          {{ personne.user }}
+          {{ personne.user + personne.score }}
         </li>
         <li class="list-group-item" v-else>
-          {{ personne.user }}
+          {{ personne.user + personne.score }}
         </li>
       </ul>
     </div>
@@ -19,12 +19,16 @@
         <Game />
       </div>
       <div class="col-md-3">
-        <DarkTheme/>
+        <DarkTheme />
         <perfect-scrollbar id="ps-container">
           <div class="messages" v-for="(msg, index) in messages" :key="index">
             <p>
-              <span class="font-italic" v-if="msg.timeInfo">({{ msg.timeInfo }}) </span>
-              <span class="font-weight-bold" v-if="msg.user">{{ msg.user }}: </span>
+              <span class="font-italic" v-if="msg.timeInfo"
+                >({{ msg.timeInfo }})
+              </span>
+              <span class="font-weight-bold" v-if="msg.user"
+                >{{ msg.user }}:
+              </span>
               {{ msg.message }}
             </p>
           </div>
@@ -54,7 +58,8 @@ export default {
       user: "",
       message: "",
       messages: [],
-      p: [],
+      listePersonne: [],
+      dejaRepondu: false,
     };
   },
 
@@ -98,13 +103,14 @@ export default {
     },
 
     sendMessage(e) {
-      if (this.message != "" && this.user != "") {
+      if (this.message != "" && this.user != "" && !this.dejaRepondu) {
         e.preventDefault();
 
         this.$store.state.socket.emit("SEND_MESSAGE", {
           user: this.user,
           message: this.message,
           timeInfo: this.currentTime(),
+          dejaRepondu: this.dejaRepondu,
         });
         this.message = "";
       }
@@ -130,11 +136,19 @@ export default {
     });
 
     this.$store.state.socket.on("miseAJourPersonnes", (data) => {
-      this.p = [];
-      for (let i = 0; i < data.length; i++) {
-        this.p = [...this.p, data[i]];
-      }
+      this.listePersonne = data;
     });
+
+    this.$store.state.socket.on("miseAJourScore", (data) => {
+      this.listePersonne = data;
+    });
+
+    this.$store.state.socket.on("miseAJourRepondus", (data) => {
+      if (this.user==data.user){
+        this.dejaRepondu=true;
+      }      
+    });
+
   },
 };
 </script>

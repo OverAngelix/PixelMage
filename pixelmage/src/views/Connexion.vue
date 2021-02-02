@@ -32,6 +32,7 @@ export default {
       if (this.user != "") {
         this.$store.state.socket.emit("connexionServeur", {
           user: this.user,
+          score : 0,
         });
       }
     },
