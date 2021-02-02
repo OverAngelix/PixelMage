@@ -32,7 +32,18 @@ io.on('connection', function (socket) {
             io.emit('MESSAGE', { message: message });
             let index = listePersonne.findIndex(e => e.user == data.user);
             if (!data.dejaRepondu) {
-                listePersonne[index].score++;
+                if (imageprogress<timeRound/6){
+                    listePersonne[index].score+=100;
+                }
+                else if (imageprogress<timeRound/3){
+                    listePersonne[index].score+=60;
+                }
+                else if (imageprogress<5*timeRound/6){
+                    listePersonne[index].score+=40;
+                }
+                else{
+                    listePersonne[index].score+=20;
+                }
                 listePersonne[index].dejaRepondu=true;
                 io.emit('miseAJourRepondus', data);
             }
