@@ -32,7 +32,17 @@ io.on('connection', function (socket) {
     });
 
     socket.on('connexionServeur', function (data) {
-        listePersonne = [...listePersonne, data];
+        if (listePersonne.some((e) => e.user == data.user)) {
+            io.emit('accessDenied', data.user);
+        }
+        else {            
+            listePersonne = [...listePersonne, data];
+            io.emit('accessAuthorized');
+        }
+
+    });
+
+    socket.on('envoiInfosServeur', function () {
         io.emit('miseAJourChat', globalchat);
         io.emit('miseAJourPersonnes', listePersonne);
     });

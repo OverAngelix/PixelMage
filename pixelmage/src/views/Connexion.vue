@@ -9,9 +9,8 @@
         <button type="submit" class="btn btn-success">Envoyer</button>
       </form>
     </div>
-    <DarkTheme/>
+    <DarkTheme />
   </div>
-
 </template>
 
 
@@ -29,11 +28,11 @@ export default {
 
   methods: {
     connexion(e) {
+      e.preventDefault();
       if (this.user != "") {
-        e.preventDefault();
-        localStorage.username = this.user;
-        this.$store.commit("connection");
-        this.$router.push("/game");
+        this.$store.state.socket.emit("connexionServeur", {
+          user: this.user,
+        });
       }
     },
   },
@@ -42,6 +41,19 @@ export default {
     if (localStorage.username) {
       this.user = localStorage.username;
     }
+    this.$store.state.socket.on("accessDenied", (data) => {
+      if (this.user == data) {
+        alert(
+          "Ce pseudo est déjà présent dans la partie ! Veuillez le changer."
+        );
+      }
+    });
+
+    this.$store.state.socket.on("accessAuthorized", () => {
+      localStorage.username = this.user;
+      this.$store.commit("connection");
+      this.$router.push("/game");
+    });
   },
 };
 </script>

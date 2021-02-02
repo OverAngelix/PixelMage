@@ -19,6 +19,7 @@
         <Game />
       </div>
       <div class="col-md-3">
+        <DarkTheme/>
         <perfect-scrollbar id="ps-container">
           <div class="messages" v-for="(msg, index) in messages" :key="index">
             <p>
@@ -36,7 +37,6 @@
         </form>
       </div>
     </div>
-    <DarkTheme/>
   </div>
 </template>
 
@@ -120,9 +120,7 @@ export default {
     if (localStorage.username) {
       this.user = localStorage.username;
     }
-    this.$store.state.socket.emit("connexionServeur", {
-      user: this.user,
-    });
+    this.$store.state.socket.emit("envoiInfosServeur");
 
     this.$store.state.socket.on("miseAJourChat", (data) => {
       this.messages = [];
