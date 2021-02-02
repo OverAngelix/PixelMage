@@ -26,6 +26,11 @@ const store = new Vuex.Store({
       { image: "hercule.jpg", reponse: "Hercule" },
       { image: "mister_jack.jpg", reponse: "L'étrange Noël de Monsieur Jack" },
       { image: "reine_des_neiges.jpg", reponse: "La Reine des Neiges" },
+      { image: "le_bossu_de_notre_dame.jpg", reponse: "Le Bossu de Notre-Dame" },
+      { image: "malefique.jpg", reponse: "Maléfique" },
+      { image: "raiponce.jpg", reponse: "Raiponce" },
+      { image: "peter_pan.jpg", reponse: "Peter Pan" },
+      { image: "bambi.jpg", reponse: "Bambi" },
     ],
   },
   mutations: {
