@@ -9,6 +9,7 @@ let gameStart = true;
 let nbround = 0;
 const maxround = 10;
 const timeRound = 60;
+let categorie="Célébrités";
 
 
 const server = app.listen(3001, function () {
@@ -67,7 +68,9 @@ io.on('connection', function (socket) {
 
     socket.on('lancementChrono', function (data) {
         if (gameStart) {
-            imageselected = Math.floor(Math.random() * data.imagessize)
+            let imagesCategorie=data.images.filter(e => e.categorie == categorie);
+            imageselected = Math.floor(Math.random() * imagesCategorie.length)
+            imageselected = data.images.findIndex(e => e.image==imagesCategorie[imageselected].image);
             chrono();
             gameStart = false;
         }
@@ -81,7 +84,10 @@ io.on('connection', function (socket) {
         if (nbround < maxround) {
             nbround++;
             imageprogress = 0;
-            imageselected = Math.floor(Math.random() * data.imagessize)
+            let imagesCategorie=data.images.filter(e => e.categorie == categorie);
+            imageselected = Math.floor(Math.random() * imagesCategorie.length)
+            imageselected = data.images.findIndex(e => e.image==imagesCategorie[imageselected].image);
+            //imageselected = Math.floor(Math.random() * data.images.length)
             reponseImage = "";
             io.emit('RAZ');
         }

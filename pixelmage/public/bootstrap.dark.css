@@ -10508,3 +10508,20 @@ a.text-dark:hover, a.text-dark:focus {
 .list-group-item-action .list-group-item-heading {
   color: #fff;
 }
+
+.messages{
+  color:white;
+}
+
+
+.custom-control-label{
+  color:white;
+}
+
+label{
+  color:white;
+}
+
+.list-group-item{
+  color:white;
+}

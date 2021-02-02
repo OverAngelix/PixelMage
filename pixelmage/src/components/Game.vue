@@ -30,6 +30,7 @@ export default {
   created() {
     this.$store.state.socket.emit("lancementChrono", {
       imagessize: this.$store.state.images.length,
+      images: this.$store.state.images,
     });
   },
   methods: {
@@ -54,6 +55,7 @@ export default {
       } else if (this.myTimer >= this.timeRound) {
         this.$store.state.socket.emit("newRound", {
           imagessize: this.$store.state.images.length,
+          images:this.$store.state.images,
         });
       }
     },
