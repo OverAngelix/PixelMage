@@ -6,6 +6,8 @@ let imageprogress = 1;
 let imageselected = 0;
 let reponseImage = "";
 let gameStart = true;
+let nbround = 0;
+let maxround = 10;
 
 
 
@@ -24,17 +26,19 @@ io.on('connection', function (socket) {
     // console.log(socket.id)
     socket.on('SEND_MESSAGE', function (data) {
         globalchat = [...globalchat, data];
-        io.emit('MESSAGE', data);
         if (data.message.toLowerCase() == reponseImage.toLowerCase()) {
             message = data.user + " a trouvé la reponse"
             io.emit('MESSAGE', { message: message });
             let index = listePersonne.findIndex(e => e.user == data.user);
-            if (!data.dejaRepondu){
+            if (!data.dejaRepondu) {
                 listePersonne[index].score++;
                 io.emit('miseAJourRepondus', data);
             }
-            
+
             io.emit('miseAJourScore', listePersonne);
+        }
+        else {
+            io.emit('MESSAGE', data);
         }
     });
 
@@ -42,7 +46,7 @@ io.on('connection', function (socket) {
         if (listePersonne.some((e) => e.user == data.user)) {
             io.emit('accessDenied', data.user);
         }
-        else {            
+        else {
             listePersonne = [...listePersonne, data];
             io.emit('accessAuthorized');
         }
@@ -60,16 +64,27 @@ io.on('connection', function (socket) {
             listePersonne.splice(indexPersonne, 1);
         }
     });
+
     socket.on('lancementChrono', function (data) {
         if (gameStart) {
             imageselected = Math.floor(Math.random() * data.imagessize)
             chrono();
         }
     });
+
     socket.on('reponseImage', function (data) {
         if (gameStart) {
             reponseImage = data.reponseImage
             gameStart = false;
+        }
+    });
+
+    socket.on('newRound', function (data) {
+        if (nbround < maxround) {
+            nbround++;
+            imageprogress = 0;
+            imageselected = Math.floor(Math.random() * data.imagessize)
+            reponseImage = "";
         }
     });
 });

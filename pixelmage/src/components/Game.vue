@@ -27,6 +27,28 @@ export default {
     this.$store.state.socket.emit("lancementChrono", {
       imagessize: this.$store.state.images.length,
     });
+  },
+  methods: {
+    pixelateImage(intensite) {
+      var img = new Image();
+      if (this.myTimer < 60) {
+        img.onload = function () {
+          eightBit(document.getElementById("canvas"), img, intensite); //on va de 0 à 50
+        };
+        img.src = require("../assets/images/" +
+          this.$store.state.images[this.myImageIndex].image);
+      }
+      if (this.myTimer >= 60 && this.myTimer < 70) {
+        intensite = 50;
+      } else if (this.myTimer >= 60) {
+        this.$store.state.socket.emit("newRound", {
+          imagessize: this.$store.state.images.length,
+        });
+      }
+    },
+  },
+
+  mounted() {
     this.$store.state.socket.on("pixeliserImage", (data) => {
       this.myTimer = data.imageprogress;
       this.myImageIndex = data.imageselected;
@@ -35,19 +57,10 @@ export default {
       });
     });
   },
-  methods: {
-    pixelateImage(intensite) {
-      var img = new Image();
-      img.onload = function () {
-        eightBit(document.getElementById("canvas"), img, intensite); //on va de 0 à 50
-      };
-      img.src = require("../assets/images/" +
-        this.$store.state.images[this.myImageIndex].image);
-    },
-  },
+
   watch: {
     myTimer(newTimer) {
-      this.pixelateImage(newTimer / 10 + 1);
+      this.pixelateImage(newTimer / 10 + 0.2);
     },
   },
 };
