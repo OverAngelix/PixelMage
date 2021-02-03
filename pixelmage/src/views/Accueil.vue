@@ -72,12 +72,10 @@ export default {
     if (this.$store.state.connected == false) {
       this.$router.push("/connexion");
     }
-    console.log("room client: "+this.room);
   },
 
   destroyed() {
     window.removeEventListener("beforeunload", this.beforeunloadFn);
-    console.log("DESTROYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
   },
 
   methods: {
@@ -87,7 +85,6 @@ export default {
         room: this.room,
         
       });
-      console.log("roomFinClient:"+this.room);
     },
 
     scrollToEnd() {

@@ -84,7 +84,6 @@ export default {
 
     this.$store.state.socket.on("envoiSalonsCrees",(data)=>{
       this.listeRooms=data;
-      console.log(this.listeRooms);
     });
   },
 };

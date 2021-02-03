@@ -59,7 +59,6 @@ io.on('connection', function (socket) {
     socket.on('connexionServeur', function (data) {
         if (!map.has(data.room)) {
             map.set(data.room, { personnes: [], chat: [], imageprogress: 1, imageselected: 0, reponseImage: "", gameStart: true, nbround: 0, categorie: "Célébrités" ,});
-            console.log(map.get(data.room))
             socket.join(data.room);
             map.get(data.room).personnes = [...map.get(data.room).personnes, data];
             io.emit('envoiSalonsCrees',getSalons());
@@ -72,7 +71,6 @@ io.on('connection', function (socket) {
 
             map.get(data.room).personnes = [...map.get(data.room).personnes, data];
         }
-        console.log(map.get(data.room).personnes);
         io.sockets.in(data.room).emit('accessAuthorized');
     });
 
@@ -84,7 +82,6 @@ io.on('connection', function (socket) {
     });
 
     socket.on('deconnexionServeur', function (data) {
-        console.log("deco room serveur:"+data.room);
         const indexPersonne = map.get(data.room).personnes.findIndex(e => e.user == data.user);
         if (indexPersonne > -1) {
             map.get(data.room).personnes.splice(indexPersonne, 1);
@@ -98,7 +95,6 @@ io.on('connection', function (socket) {
     });
 
     socket.on('lancementChrono', function (data) {
-        console.log(data.room);
         if (map.get(data.room).gameStart) {
             let imagesCategorie = data.images.filter(e => e.categorie == map.get(data.room).categorie);
             map.get(data.room).imageselected = Math.floor(Math.random() * imagesCategorie.length)
