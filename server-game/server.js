@@ -58,10 +58,10 @@ io.on('connection', function (socket) {
 
     socket.on('connexionServeur', function (data) {
         if (!map.has(data.room)) {
-            map.set(data.room, { personnes: [], chat: [], imageprogress: 1, imageselected: 0, reponseImage: "", gameStart: true, nbround: 0, categorie: "Célébrités" ,});
+            map.set(data.room, { personnes: [], chat: [], imageprogress: 1, imageselected: 0, reponseImage: "", gameStart: true, nbround: 0, categorie: "Célébrités", });
             socket.join(data.room);
             map.get(data.room).personnes = [...map.get(data.room).personnes, data];
-            io.emit('envoiSalonsCrees',getSalons());
+            io.emit('envoiSalonsCrees', getSalons());
         } else if (map.get(data.room).personnes.some((e) => e.user == data.user)) {
 
             io.sockets.in(data.room).emit('accessDenied', data.user);
@@ -100,7 +100,7 @@ io.on('connection', function (socket) {
             map.get(data.room).imageselected = Math.floor(Math.random() * imagesCategorie.length)
             map.get(data.room).imageselected = data.images.findIndex(e => e.image == imagesCategorie[map.get(data.room).imageselected].image);
             let interval = chrono(data.room);
-            map.get(data.room).interval=interval;
+            map.get(data.room).interval = interval;
             map.get(data.room).gameStart = false;
         }
     });
@@ -143,10 +143,10 @@ function chrono(room) {
     return interval;
 }
 
-function getSalons(){
-    let salons = [];
+function getSalons() {
+    let informationsSalons = [];
     map.forEach((values, keys) => {
-        salons.push(keys);
+        informationsSalons.push({ salon: keys, personnesParSalon: values.personnes.length });
     })
-    return salons;
+    return informationsSalons;
 }

@@ -21,13 +21,29 @@
             <DarkTheme class="col align-self-end ml-5 col-4" />
           </div>
         </form>
+        <div class="bg-secondary mt-5 text-white p-2">
+          <!--  Mon frere me casse les couilles avec sa musique TRES FORTE de merde -->
+          <div>
+            <p style="text-align: center"><u>Salons</u></p>
+
+            <table class="table table-striped">
+                <tr>
+                  <td>Salon</td>
+                  <td>Joueurs</td>
+                </tr>
+              <tbody
+                v-for="(informations, index) in informationsSalles"
+                :key="index"
+              >
+                <tr>
+                  <td class=" col-md-8">{{ informations.salon }}</td>
+                  <td class=" col-md-4">{{ informations.personnesParSalon }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="bg-secondary text-white p-2">
-      <p>Salons :</p>
-      <ul class="list-group" v-for="(room, index) in listeRooms" :key="index">
-        <li class="list-group-item"><a href="">{{room}}</a></li>
-      </ul>
     </div>
   </div>
 </template>
@@ -43,7 +59,7 @@ export default {
     return {
       user: "",
       room: "",
-      listeRooms:[],
+      informationsSalles: [],
     };
   },
 
@@ -79,11 +95,10 @@ export default {
       this.$router.push({ path: "/game", query: { room: this.room } });
     });
 
-    this.$store.state.socket.emit("getSalonsCrees",()=>{
-    });
+    this.$store.state.socket.emit("getSalonsCrees", () => {});
 
-    this.$store.state.socket.on("envoiSalonsCrees",(data)=>{
-      this.listeRooms=data;
+    this.$store.state.socket.on("envoiSalonsCrees", (data) => {
+      this.informationsSalles = data;
     });
   },
 };
