@@ -27,17 +27,17 @@
             <p style="text-align: center"><u>Salons</u></p>
 
             <table class="table table-striped">
-                <tr>
-                  <td>Salon</td>
-                  <td>Joueurs</td>
-                </tr>
+              <tr>
+                <td>Salon</td>
+                <td>Joueurs</td>
+              </tr>
               <tbody
                 v-for="(informations, index) in informationsSalles"
                 :key="index"
               >
                 <tr>
-                  <td class=" col-md-8">{{ informations.salon }}</td>
-                  <td class=" col-md-4">{{ informations.personnesParSalon }}</td>
+                  <td class="col-md-8">{{ informations.salon }}</td>
+                  <td class="col-md-4">{{ informations.personnesParSalon }}</td>
                 </tr>
               </tbody>
             </table>
@@ -72,6 +72,7 @@ export default {
           score: 0,
           dejaRepondu: false,
           room: this.room,
+          host: false,
         });
       }
     },

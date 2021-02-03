@@ -1,5 +1,10 @@
 <template>
   <div>
+    <select v-if="host && partieCommencee != true" v-model="categorieSelected">
+      <option v-for="categorie in categories" :value="categorie" :key="categorie.id">
+        {{ categorie }}
+      </option>
+    </select>
     <div class="row justify-content-center">
       <ul
         class="listePersonnes col-1"
@@ -9,6 +14,11 @@
         <li class="list-group-item active" v-if="personne.user == user">
           {{ personne.user }} <br />
           {{ personne.score }}
+          <div v-if="host && partieCommencee != true">
+            <button type="button" @click="lancerPartie" class="btn btn-danger">
+              Commencer !
+            </button>
+          </div>
         </li>
         <li class="list-group-item" v-else>
           {{ personne.user }} <br />
@@ -63,11 +73,16 @@ export default {
       listePersonne: [],
       dejaRepondu: false,
       room: "",
+      host: false,
+      partieCommencee: false,
+      categorieSelected: "TOUTES",
+      categories: [],
     };
   },
 
   created() {
     window.addEventListener("beforeunload", this.beforeunloadFn);
+    this.categories = this.$store.state.categories;
     this.room = this.$route.query.room;
     if (this.$store.state.connected == false) {
       this.$router.push("/connexion");
@@ -79,11 +94,22 @@ export default {
   },
 
   methods: {
+    lancerPartie() {
+      if (this.room !== undefined) {
+        this.$store.state.socket.emit("lancementChrono", {
+          categorie : this.categorieSelected,
+          imagessize: this.$store.state.images.length,
+          images: this.$store.state.images,
+          room: this.room,
+        });
+        this.partieCommencee = true;
+      }
+    },
+
     beforeunloadFn() {
       this.$store.state.socket.emit("deconnexionServeur", {
         user: this.user,
         room: this.room,
-        
       });
     },
 
@@ -133,6 +159,10 @@ export default {
       console.log(data);
     });
 
+    this.$store.state.socket.on("partyFinish", () => {
+      this.partieCommencee = false;
+    });
+
     if (localStorage.username) {
       this.user = localStorage.username;
     }
@@ -154,6 +184,7 @@ export default {
 
     this.$store.state.socket.on("miseAJourPersonnes", (data) => {
       this.listePersonne = data;
+      this.host = data.filter((e) => e.user == this.user)[0].host;
     });
 
     this.$store.state.socket.on("miseAJourScore", (data) => {

@@ -1,16 +1,20 @@
 <template>
   <div>
-    <div
+    <div v-if="drawGame && myTimer>=1"
       class="offset-md-2 col-md-8 offset-md-2 bg-warning mt-3 mb-3 text-center"
     >
       {{ response }} {{ myTimer }}
     </div>
-    <div class="offset-md-2 col-md-8 offset-md-2 pl-0 pr-0">
+    <div v-if="drawGame && myTimer>=1" class="offset-md-2 col-md-8 offset-md-2 pl-0 pr-0">
       <div class="row justify-content-md-center">
-        <canvas id="canvas" class="img-fluid"/>
+        <canvas id="canvas" class="img-fluid" />
       </div>
     </div>
+    <div v-else class="offset-md-2 col-md-8 offset-md-2 pl-0 pr-0">
+      <div class="row justify-content-md-center">AFFICHER LEADERBOARD</div>
+    </div>
   </div>
+  
 </template>
 
 
@@ -23,20 +27,14 @@ export default {
       myImageIndex: -1,
       myTimer: 0,
       timeRound: 60,
-      timeFinalRound: 70,
+      timeFinalRound: 65,
       response: "",
       room: "",
+      drawGame: true,
     };
   },
   created() {
     this.room = this.$route.query.room;
-    if (this.room !== undefined) {
-      this.$store.state.socket.emit("lancementChrono", {
-        imagessize: this.$store.state.images.length,
-        images: this.$store.state.images,
-        room: this.room,
-      });
-    }
   },
   methods: {
     pixelateImage(intensite) {
@@ -105,6 +103,16 @@ export default {
     });
     this.$store.state.socket.on("toutLeMondeATrouve", () => {
       this.myTimer = this.timeRound;
+    });
+
+    this.$store.state.socket.on("partyFinish", () => {
+      this.drawGame = false;
+    });
+
+     this.$store.state.socket.on("partyBegin", () => {
+      this.myTimer = 0;
+      this.response = "";
+       this.drawGame = true;
     });
   },
 

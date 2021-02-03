@@ -21,6 +21,7 @@ const store = new Vuex.Store({
   state: {
     socket : io("localhost:3001"),
     connected: false,
+    categories : ["TOUTES","Disney","Célébrités"],
     images: [
       { image: "roi_lion.jpg", reponse: "Le Roi Lion", categorie: "Disney" },
       { image: "hercule.jpg", reponse: "Hercule", categorie: "Disney"},
