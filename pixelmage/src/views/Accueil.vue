@@ -7,10 +7,12 @@
         :key="index"
       >
         <li class="list-group-item active" v-if="personne.user == user">
-          {{ personne.user }} <br> {{personne.score}}
+          {{ personne.user }} <br />
+          {{ personne.score }}
         </li>
         <li class="list-group-item" v-else>
-            {{ personne.user }} <br> {{personne.score}}
+          {{ personne.user }} <br />
+          {{ personne.score }}
         </li>
       </ul>
     </div>
@@ -60,12 +62,13 @@ export default {
       messages: [],
       listePersonne: [],
       dejaRepondu: false,
+      room: "",
     };
   },
 
   created() {
     window.addEventListener("beforeunload", () => this.beforeunloadFn());
-
+    this.room = this.$route.query.room;
     if (this.$store.state.connected == false) {
       this.$router.push("/connexion");
     }
@@ -79,6 +82,7 @@ export default {
     beforeunloadFn() {
       this.$store.state.socket.emit("deconnexionServeur", {
         user: this.user,
+        room: this.room,
       });
     },
 
@@ -111,6 +115,7 @@ export default {
           message: this.message,
           timeInfo: this.currentTime(),
           dejaRepondu: this.dejaRepondu,
+          room: this.room,
         });
         this.message = "";
       }
@@ -123,10 +128,17 @@ export default {
       this.scrollToEnd();
     });
 
+    this.$store.state.socket.on("messageRoom", (data) => {
+      console.log(data);
+    });
+
     if (localStorage.username) {
       this.user = localStorage.username;
     }
-    this.$store.state.socket.emit("envoiInfosServeur");
+
+    this.$store.state.socket.emit("envoiInfosServeur", {
+      room: this.room,
+    });
 
     this.$store.state.socket.on("miseAJourChat", (data) => {
       this.messages = [];
@@ -135,8 +147,8 @@ export default {
       }
     });
 
-  this.$store.state.socket.on("RAZ", () => {
-    this.dejaRepondu=false;
+    this.$store.state.socket.on("RAZ", () => {
+      this.dejaRepondu = false;
     });
 
     this.$store.state.socket.on("miseAJourPersonnes", (data) => {
@@ -148,11 +160,10 @@ export default {
     });
 
     this.$store.state.socket.on("miseAJourRepondus", (data) => {
-      if (this.user==data.user){
-        this.dejaRepondu=true;
-      }      
+      if (this.user == data.user) {
+        this.dejaRepondu = true;
+      }
     });
-
   },
 };
 </script>

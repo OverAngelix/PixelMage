@@ -2,9 +2,13 @@
   <div class="row">
     <div class="col-md-9">
       <form @submit.prevent="connexion">
-        <div class="gorm-group">
+        <div class="form-group">
           <label for="user">Nom d'utilisateur:</label>
           <input type="text" v-model="user" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label for="user">room:</label>
+          <input type="text" v-model="room" class="form-control" />
         </div>
         <button type="submit" class="btn btn-success">Envoyer</button>
       </form>
@@ -23,17 +27,19 @@ export default {
   data() {
     return {
       user: "",
+      room: "",
     };
   },
 
   methods: {
     connexion(e) {
       e.preventDefault();
-      if (this.user != "") {
+       if (this.user != "" && this.room != "") {
         this.$store.state.socket.emit("connexionServeur", {
           user: this.user,
-          score : 0,
+          score: 0,
           dejaRepondu: false,
+          room: this.room,
         });
       }
     },
@@ -54,7 +60,7 @@ export default {
     this.$store.state.socket.on("accessAuthorized", () => {
       localStorage.username = this.user;
       this.$store.commit("connection");
-      this.$router.push("/game");
+      this.$router.push({ path: "/game", query: { room: this.room } });
     });
   },
 };

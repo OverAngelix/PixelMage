@@ -1,15 +1,9 @@
 const express = require('express');
-let globalchat = [];
-let listePersonne = [];
 const app = express();
-let imageprogress = 1;
-let imageselected = 0;
-let reponseImage = "";
-let gameStart = true;
-let nbround = 0;
 const maxround = 10;
 const timeRound = 60;
-let categorie="Célébrités";
+
+var map = new Map();
 
 
 const server = app.listen(3001, function () {
@@ -25,107 +19,116 @@ const io = require('socket.io')(server, {
 
 io.on('connection', function (socket) {
     // console.log(socket.id)
+
+
     socket.on('SEND_MESSAGE', function (data) {
-        globalchat = [...globalchat, data];
-        if (data.message.toLowerCase() == reponseImage.toLowerCase() && imageprogress<timeRound) {
+        map.get(data.room).chat = [...map.get(data.room).chat, data];
+        if (data.message.toLowerCase() == map.get(data.room).reponseImage.toLowerCase() && map.get(data.room).imageprogress < timeRound) {
             message = data.user + " a trouvé la reponse"
-            io.emit('MESSAGE', { message: message });
-            let index = listePersonne.findIndex(e => e.user == data.user);
+            io.sockets.in(data.room).emit('MESSAGE', { message: message });
+            let index = map.get(data.room).personnes.findIndex(e => e.user == data.user);
             if (!data.dejaRepondu) {
-                if (imageprogress<timeRound/6){
-                    listePersonne[index].score+=100;
+                if (map.get(data.room).imageprogress < timeRound / 6) {
+                    map.get(data.room).personnes[index].score += 100;
                 }
-                else if (imageprogress<timeRound/3){
-                    listePersonne[index].score+=60;
+                else if (map.get(data.room).imageprogress < timeRound / 3) {
+                    map.get(data.room).personnes[index].score += 60;
                 }
-                else if (imageprogress<5*timeRound/6){
-                    listePersonne[index].score+=40;
+                else if (map.get(data.room).imageprogress < 5 * timeRound / 6) {
+                    map.get(data.room).personnes[index].score += 40;
                 }
-                else{
-                    listePersonne[index].score+=20;
+                else {
+                    map.get(data.room).personnes[index].score += 20;
                 }
-                listePersonne[index].dejaRepondu=true;
-                io.emit('miseAJourRepondus', data);
+                map.get(data.room).personnes[index].dejaRepondu = true;
+                io.sockets.in(data.room).emit('miseAJourRepondus', data);
             }
 
-            io.emit('miseAJourScore', listePersonne);
-            //si tout le monde a rep, on passe au suivant
-            console.log(listePersonne.length);
-            console.log(listePersonne.filter(e=>e.dejaRepondu==true).length);
-             if(listePersonne.length==listePersonne.filter(e=>e.dejaRepondu==true).length){
-                console.log("tout le monde a trouvé");
-                io.emit('toutLeMondeATrouve');
-                imageprogress=timeRound;
-            } 
+            io.emit('miseAJourScore', map.get(data.room).personnes);
+            //si tout le monde a rep, on passe au suivantbqqq
+            if (map.get(data.room).personnes.length == map.get(data.room).personnes.filter(e => e.dejaRepondu == true).length) {
+                io.sockets.in(data.room).emit('toutLeMondeATrouve');
+                map.get(data.room).imageprogress = timeRound;
+            }
         }
         else {
-            io.emit('MESSAGE', data);
+            io.sockets.in(data.room).emit('MESSAGE', data);
         }
     });
 
     socket.on('connexionServeur', function (data) {
-        if (listePersonne.some((e) => e.user == data.user)) {
-            io.emit('accessDenied', data.user);
+        if (!map.has(data.room)) {
+            console.log("ICI1");
+            map.set(data.room, { personnes: [], chat: [], imageprogress: 1, imageselected: 0, reponseImage: "", gameStart: true, nbround: 0, categorie: "Célébrités" });
+            console.log(map.get(data.room))
+            socket.join(data.room);
+            map.get(data.room).personnes = [...map.get(data.room).personnes, data];
+        } else if (map.get(data.room).personnes.some((e) => e.user == data.user)) {
+            console.log("ICI2");
+            io.sockets.in(data.room).emit('accessDenied', data.user);
         }
         else {
-            listePersonne = [...listePersonne, data];
-            io.emit('accessAuthorized');
+            socket.join(data.room);
+            console.log("ICI3");
+            map.get(data.room).personnes = [...map.get(data.room).personnes, data];
         }
-
+        console.log(map.get(data.room).personnes);
+        io.sockets.in(data.room).emit('accessAuthorized');
     });
 
-    socket.on('envoiInfosServeur', function () {
-        io.emit('miseAJourChat', globalchat);
-        io.emit('miseAJourPersonnes', listePersonne);
+    socket.on('envoiInfosServeur', function (data) {
+        io.sockets.in(data.room).emit('miseAJourChat', map.get(data.room).chat);
+        io.sockets.in(data.room).emit('miseAJourPersonnes', map.get(data.room).personnes);
     });
 
     socket.on('deconnexionServeur', function (data) {
-        const indexPersonne = listePersonne.findIndex(e => e.user == data.user);
+        const indexPersonne = map.get(data.room).personnes.findIndex(e => e.user == data.user);
         if (indexPersonne > -1) {
-            listePersonne.splice(indexPersonne, 1);
+            map.get(data.room).personnes.splice(indexPersonne, 1);
         }
     });
 
     socket.on('lancementChrono', function (data) {
-        if (gameStart) {
-            let imagesCategorie=data.images.filter(e => e.categorie == categorie);
-            imageselected = Math.floor(Math.random() * imagesCategorie.length)
-            imageselected = data.images.findIndex(e => e.image==imagesCategorie[imageselected].image);
-            chrono();
-            gameStart = false;
+        console.log(data.room);
+        if (map.get(data.room).gameStart) {
+            let imagesCategorie = data.images.filter(e => e.categorie == map.get(data.room).categorie);
+            map.get(data.room).imageselected = Math.floor(Math.random() * imagesCategorie.length)
+            map.get(data.room).imageselected = data.images.findIndex(e => e.image == imagesCategorie[map.get(data.room).imageselected].image);
+            chrono(data.room);
+            map.get(data.room).gameStart = false;
         }
     });
 
     socket.on('reponseImage', function (data) {
-        reponseImage = data.reponseImage
+        map.get(data.room).reponseImage = data.reponseImage
     });
 
     socket.on('newRound', function (data) {
-        if (nbround < maxround) {
-            nbround++;
-            imageprogress = 0;
-            let imagesCategorie=data.images.filter(e => e.categorie == categorie);
-            imageselected = Math.floor(Math.random() * imagesCategorie.length)
-            imageselected = data.images.findIndex(e => e.image==imagesCategorie[imageselected].image);
-            //imageselected = Math.floor(Math.random() * data.images.length)
+        if (map.get(data.room).nbround < maxround) {
+            map.get(data.room).nbround++;
+            map.get(data.room).imageprogress = 0;
+            let imagesCategorie = data.images.filter(e => e.categorie == map.get(data.room).categorie);
+            map.get(data.room).imageselected = Math.floor(Math.random() * imagesCategorie.length)
+            map.get(data.room).imageselected = data.images.findIndex(e => e.image == imagesCategorie[map.get(data.room).imageselected].image);
             reponseImage = "";
-            io.emit('RAZ');
-            for (let i=0;i<listePersonne.length;i++){
-                listePersonne[i].dejaRepondu=false;
+            io.sockets.in(data.room).emit('RAZ');
+            for (let i = 0; i < map.get(data.room).personnes.length; i++) {
+                map.get(data.room).personnes[i].dejaRepondu = false;
             }
-            console.log(listePersonne);
         }
     });
 });
 
-function chrono() {
+function chrono(room) {
     setInterval(function () {
-        imageprogress++;
-        io.emit('pixeliserImage', {
-            imageprogress: imageprogress,
-            imageselected: imageselected
+        map.get(room).imageprogress++;
+        io.sockets.in(room).emit('pixeliserImage', {
+            imageprogress: map.get(room).imageprogress,
+            imageselected: map.get(room).imageselected
         }
         );
+        /*         io.sockets.in("1234").emit('messageRoom', 'what is going on, party people?');
+                io.sockets.in('4321').emit('messageRoom', 'anyone in this room yet?'); */
     }, 1000);
 }
 

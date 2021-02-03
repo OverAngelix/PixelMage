@@ -25,13 +25,18 @@ export default {
       timeRound: 60,
       timeFinalRound: 70,
       response: "",
+      room: "",
     };
   },
   created() {
-    this.$store.state.socket.emit("lancementChrono", {
-      imagessize: this.$store.state.images.length,
-      images: this.$store.state.images,
-    });
+    this.room = this.$route.query.room;
+    if (this.room !== undefined) {
+      this.$store.state.socket.emit("lancementChrono", {
+        imagessize: this.$store.state.images.length,
+        images: this.$store.state.images,
+        room: this.room,
+      });
+    }
   },
   methods: {
     pixelateImage(intensite) {
@@ -55,7 +60,8 @@ export default {
       } else if (this.myTimer >= this.timeRound) {
         this.$store.state.socket.emit("newRound", {
           imagessize: this.$store.state.images.length,
-          images:this.$store.state.images,
+          images: this.$store.state.images,
+          room: this.room,
         });
       }
     },
@@ -80,10 +86,12 @@ export default {
     this.$store.state.socket.on("pixeliserImage", (data) => {
       this.myTimer = data.imageprogress;
       this.myImageIndex = data.imageselected;
-      console.log(this.$store.state.images[this.myImageIndex].reponse);
-      this.$store.state.socket.emit("reponseImage", {
-        reponseImage: this.$store.state.images[this.myImageIndex].reponse,
-      });
+      if (this.room !== undefined) {
+        this.$store.state.socket.emit("reponseImage", {
+          reponseImage: this.$store.state.images[this.myImageIndex].reponse,
+          room: this.room,
+        });
+      }
       if (
         this.myTimer >= this.timeRound &&
         this.myTimer <= this.timeFinalRound
@@ -95,12 +103,8 @@ export default {
         );
       }
     });
-    this.$store.state.socket.on('toutLeMondeATrouve', ()=>{
-      /* this.$store.state.socket.emit("newRound", {
-          imagessize: this.$store.state.images.length,
-          images:this.$store.state.images,
-        }); si on fait ça on n'affiche pas l'image nette à la fin*/
-      this.myTimer=this.timeRound;
+    this.$store.state.socket.on("toutLeMondeATrouve", () => {
+      this.myTimer = this.timeRound;
     });
   },
 
