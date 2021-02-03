@@ -7,7 +7,7 @@
     </div>
     <div class="offset-md-2 col-md-8 offset-md-2 pl-0 pr-0">
       <div class="row justify-content-md-center">
-        <canvas id="canvas" class="img-fluid" />
+        <canvas id="canvas" class="img-fluid"/>
       </div>
     </div>
   </div>

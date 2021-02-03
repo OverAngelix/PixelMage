@@ -67,15 +67,17 @@ export default {
   },
 
   created() {
-    window.addEventListener("beforeunload", () => this.beforeunloadFn());
+    window.addEventListener("beforeunload", this.beforeunloadFn);
     this.room = this.$route.query.room;
     if (this.$store.state.connected == false) {
       this.$router.push("/connexion");
     }
+    console.log("room client: "+this.room);
   },
 
   destroyed() {
-    window.removeEventListener("beforeunload", () => this.beforeunloadFn());
+    window.removeEventListener("beforeunload", this.beforeunloadFn);
+    console.log("DESTROYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
   },
 
   methods: {
@@ -83,7 +85,9 @@ export default {
       this.$store.state.socket.emit("deconnexionServeur", {
         user: this.user,
         room: this.room,
+        
       });
+      console.log("roomFinClient:"+this.room);
     },
 
     scrollToEnd() {

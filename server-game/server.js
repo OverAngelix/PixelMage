@@ -58,18 +58,18 @@ io.on('connection', function (socket) {
 
     socket.on('connexionServeur', function (data) {
         if (!map.has(data.room)) {
-            console.log("ICI1");
-            map.set(data.room, { personnes: [], chat: [], imageprogress: 1, imageselected: 0, reponseImage: "", gameStart: true, nbround: 0, categorie: "Célébrités" });
+            map.set(data.room, { personnes: [], chat: [], imageprogress: 1, imageselected: 0, reponseImage: "", gameStart: true, nbround: 0, categorie: "Célébrités" ,});
             console.log(map.get(data.room))
             socket.join(data.room);
             map.get(data.room).personnes = [...map.get(data.room).personnes, data];
+            io.emit('envoiSalonsCrees',getSalons());
         } else if (map.get(data.room).personnes.some((e) => e.user == data.user)) {
-            console.log("ICI2");
+
             io.sockets.in(data.room).emit('accessDenied', data.user);
         }
         else {
             socket.join(data.room);
-            console.log("ICI3");
+
             map.get(data.room).personnes = [...map.get(data.room).personnes, data];
         }
         console.log(map.get(data.room).personnes);
@@ -77,14 +77,23 @@ io.on('connection', function (socket) {
     });
 
     socket.on('envoiInfosServeur', function (data) {
-        io.sockets.in(data.room).emit('miseAJourChat', map.get(data.room).chat);
-        io.sockets.in(data.room).emit('miseAJourPersonnes', map.get(data.room).personnes);
+        if (map.has(data.room)) {
+            io.sockets.in(data.room).emit('miseAJourChat', map.get(data.room).chat);
+            io.sockets.in(data.room).emit('miseAJourPersonnes', map.get(data.room).personnes);
+        }
     });
 
     socket.on('deconnexionServeur', function (data) {
+        console.log("deco room serveur:"+data.room);
         const indexPersonne = map.get(data.room).personnes.findIndex(e => e.user == data.user);
         if (indexPersonne > -1) {
             map.get(data.room).personnes.splice(indexPersonne, 1);
+        }
+        //on supprime la room si il n'y a plus personne dedans
+        if (map.get(data.room).personnes.length == 0) {
+            clearInterval(map.get(data.room).interval);
+            map.delete(data.room);
+
         }
     });
 
@@ -94,7 +103,8 @@ io.on('connection', function (socket) {
             let imagesCategorie = data.images.filter(e => e.categorie == map.get(data.room).categorie);
             map.get(data.room).imageselected = Math.floor(Math.random() * imagesCategorie.length)
             map.get(data.room).imageselected = data.images.findIndex(e => e.image == imagesCategorie[map.get(data.room).imageselected].image);
-            chrono(data.room);
+            let interval = chrono(data.room);
+            map.get(data.room).interval=interval;
             map.get(data.room).gameStart = false;
         }
     });
@@ -117,10 +127,14 @@ io.on('connection', function (socket) {
             }
         }
     });
+
+    socket.on("getSalonsCrees", function (data) {
+        io.emit("envoiSalonsCrees", getSalons());
+    });
 });
 
 function chrono(room) {
-    setInterval(function () {
+    let interval = setInterval(function () {
         map.get(room).imageprogress++;
         io.sockets.in(room).emit('pixeliserImage', {
             imageprogress: map.get(room).imageprogress,
@@ -130,5 +144,13 @@ function chrono(room) {
         /*         io.sockets.in("1234").emit('messageRoom', 'what is going on, party people?');
                 io.sockets.in('4321').emit('messageRoom', 'anyone in this room yet?'); */
     }, 1000);
+    return interval;
 }
 
+function getSalons(){
+    let salons = [];
+    map.forEach((values, keys) => {
+        salons.push(keys);
+    })
+    return salons;
+}
