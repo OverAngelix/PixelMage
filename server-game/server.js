@@ -5,9 +5,10 @@ const timeRound = 60;
 
 var map = new Map();
 
+const PORT = process.env.PORT || 3001;
 
-const server = app.listen(3001, function () {
-    console.log('server running on port 3001');
+const server = app.listen(PORT, function () {
+    console.log('server running on port '+PORT);
 });
 
 

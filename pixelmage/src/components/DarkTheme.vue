@@ -14,7 +14,7 @@ export default {
   mounted() {
     if (localStorage.theme) {
       document.getElementById("liencss").href = localStorage.theme;
-       if (localStorage.theme=="http://localhost:8080/bootstrap.dark.css"){
+       if (localStorage.theme=="https://pixelmage-front.herokuapp.com/bootstrap.dark.css"){
           document.getElementById("customSwitch1").checked=true;
       } 
     }
@@ -24,15 +24,15 @@ export default {
         
       if (
         document.getElementById("liencss").href ==
-        "http://localhost:8080/bootstrap.min.css"
+        "https://pixelmage-front.herokuapp.com/bootstrap.min.css"
       ) {
         document.getElementById("liencss").href =
-          "http://localhost:8080/bootstrap.dark.css";
-        localStorage.theme = "http://localhost:8080/bootstrap.dark.css";
+          "https://pixelmage-front.herokuapp.com/bootstrap.dark.css";
+        localStorage.theme = "https://pixelmage-front.herokuapp.com/bootstrap.dark.css";
       } else {
         document.getElementById("liencss").href =
-          "http://localhost:8080/bootstrap.min.css";
-        localStorage.theme = "http://localhost:8080/bootstrap.min.css";
+          "https://pixelmage-front.herokuapp.com/bootstrap.min.css";
+        localStorage.theme = "https://pixelmage-front.herokuapp.com/bootstrap.min.css";
       }
     },
   },

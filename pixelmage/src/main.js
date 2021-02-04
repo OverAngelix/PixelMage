@@ -19,7 +19,7 @@ Vue.config.productionTip = false
 
 const store = new Vuex.Store({
   state: {
-    socket : io("localhost:3001"),
+    socket : io("https://pixelmage-back.herokuapp.com"),
     connected: false,
     categories : ["TOUTES","Disney","Célébrités"],
     images: [
