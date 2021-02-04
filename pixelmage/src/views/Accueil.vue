@@ -1,6 +1,6 @@
 <template>
   <div>
-    <select v-if="host && partieCommencee != true" v-model="categorieSelected">
+    Catégorie <select v-if="host && partieCommencee != true" v-model="categorieSelected" class ="custom-select col-md-1">
       <option v-for="categorie in categories" :value="categorie" :key="categorie.id">
         {{ categorie }}
       </option>
@@ -19,6 +19,7 @@
               Commencer !
             </button>
           </div>
+          
         </li>
         <li class="list-group-item" v-else>
           {{ personne.user }} <br />
